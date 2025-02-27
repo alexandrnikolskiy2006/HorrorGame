@@ -28,8 +28,6 @@ public class PlayerBehaviour : MonoBehaviour
 
         Vector3 move = transform.right * moveX + transform.forward * moveZ;
         controller.Move(move * moveSpeed * Time.deltaTime);
-
-        // controller.Move(velocity * Time.deltaTime);
     }
 
     void HandleInteraction()

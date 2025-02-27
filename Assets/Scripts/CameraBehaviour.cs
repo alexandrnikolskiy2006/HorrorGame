@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class CameraBehaviour : MonoBehaviour
 {
@@ -11,17 +12,23 @@ public class CameraBehaviour : MonoBehaviour
     public Texture2D cursorTexture;
     public Vector2 cursorSize = new Vector2(32, 32);
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    public GameObject pauseGameMenu;
+
     void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+        pauseGameMenu.SetActive(false);
 
     }
 
-    // Update is called once per frame
     void Update()
     {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            pauseGameMenu.SetActive(true);
+            Time.timeScale = 0f;
+        }
         LookAround();
         HandleCursorUnlock();
     }
@@ -62,5 +69,17 @@ public class CameraBehaviour : MonoBehaviour
             Vector2 position = new Vector2(Screen.width / 2 - cursorSize.x / 2, Screen.height / 2 - cursorSize.y / 2);
             GUI.DrawTexture(new Rect(position, cursorSize), cursorTexture);
         }
+    }
+
+    public void PauseOff()
+    {
+        pauseGameMenu.SetActive(false);
+        Time.timeScale = 1f;
+    }
+
+    public void LoadMenu()
+    {
+        Time.timeScale = 1f;
+        SceneManager.LoadScene("StartMenu");
     }
 }
