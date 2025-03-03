@@ -10,25 +10,17 @@ public class CameraBehaviour : MonoBehaviour
     private float xRotation = 0f;
 
     public Texture2D cursorTexture;
-    public Vector2 cursorSize = new Vector2(32, 32);
-
-    public GameObject pauseGameMenu;
+    public Vector2 cursorSize = new Vector2(50, 50);
 
     void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
-        pauseGameMenu.SetActive(false);
 
     }
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Escape))
-        {
-            pauseGameMenu.SetActive(true);
-            Time.timeScale = 0f;
-        }
         LookAround();
         HandleCursorUnlock();
     }
@@ -49,13 +41,13 @@ public class CameraBehaviour : MonoBehaviour
 
     void HandleCursorUnlock()
     {
-        if (Input.GetKeyDown(KeyCode.Escape))
+        if (PauseMenuScript.isPaused)
         {
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
         }
 
-        if (Input.GetMouseButtonDown(0))
+        if (!PauseMenuScript.isPaused)
         {
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
@@ -64,22 +56,11 @@ public class CameraBehaviour : MonoBehaviour
 
     void OnGUI()
     {
-        if (cursorTexture != null)
+        if (!PauseMenuScript.isPaused && cursorTexture != null)
         {
             Vector2 position = new Vector2(Screen.width / 2 - cursorSize.x / 2, Screen.height / 2 - cursorSize.y / 2);
             GUI.DrawTexture(new Rect(position, cursorSize), cursorTexture);
         }
     }
 
-    public void PauseOff()
-    {
-        pauseGameMenu.SetActive(false);
-        Time.timeScale = 1f;
-    }
-
-    public void LoadMenu()
-    {
-        Time.timeScale = 1f;
-        SceneManager.LoadScene("StartMenu");
-    }
 }

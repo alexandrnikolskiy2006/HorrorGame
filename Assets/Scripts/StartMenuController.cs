@@ -15,6 +15,7 @@ public class StartMenuController: MonoBehaviour
 
     public void StartGame()
     {
+        PauseMenuScript.isPaused = false;
         SceneManager.LoadScene("TestScene");
     }
 
