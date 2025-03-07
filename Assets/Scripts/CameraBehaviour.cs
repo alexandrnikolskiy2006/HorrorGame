@@ -3,26 +3,32 @@ using UnityEngine.SceneManagement;
 
 public class CameraBehaviour : MonoBehaviour
 {
-
     public float mouseSensitivity = 100f;
     public Transform PLAYER;
-
     private float xRotation = 0f;
 
     public Texture2D cursorTexture;
     public Vector2 cursorSize = new Vector2(50, 50);
+
+    public Camera cam;  // Ссылка на камеру
+    public float zoomFOV = 30f; // Поле зрения при зуме
+    public float normalFOV = 60f; // Обычное поле зрения
+    public float zoomSpeed = 10f; // Скорость зума
 
     void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
 
+        if (cam == null)
+            cam = GetComponent<Camera>(); // Автозахват камеры
     }
 
     void Update()
     {
         LookAround();
         HandleCursorUnlock();
+        HandleZoom();
     }
 
     void LookAround()
@@ -34,9 +40,7 @@ public class CameraBehaviour : MonoBehaviour
         xRotation = Mathf.Clamp(xRotation, -90f, 90f);
 
         transform.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
-
         PLAYER.Rotate(Vector3.up * mouseX);
-
     }
 
     void HandleCursorUnlock()
@@ -46,12 +50,20 @@ public class CameraBehaviour : MonoBehaviour
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
         }
-
-        if (!PauseMenuScript.isPaused)
+        else
         {
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
         }
+    }
+
+    void HandleZoom()
+    {
+        // Если ПКМ удерживается, приближаем камеру, иначе возвращаем в нормальное состояние
+        float targetFOV = Input.GetMouseButton(1) ? zoomFOV : normalFOV;
+
+        // Плавное изменение FOV (зум)
+        cam.fieldOfView = Mathf.Lerp(cam.fieldOfView, targetFOV, zoomSpeed * Time.deltaTime);
     }
 
     void OnGUI()
@@ -62,5 +74,4 @@ public class CameraBehaviour : MonoBehaviour
             GUI.DrawTexture(new Rect(position, cursorSize), cursorTexture);
         }
     }
-
 }

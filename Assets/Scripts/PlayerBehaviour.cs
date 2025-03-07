@@ -3,12 +3,14 @@ using UnityEngine;
 public class PlayerBehaviour : MonoBehaviour
 {
     public float moveSpeed = 5f;
-
     private CharacterController controller;
     private Vector3 velocity;
 
+    public float gravity = -9.81f; // Гравитация
     public float interactionRange = 3f; 
     public Camera playerCamera;
+
+    private bool isGrounded;
 
     void Start() 
     {
@@ -17,7 +19,15 @@ public class PlayerBehaviour : MonoBehaviour
 
     void Update()
     {
+        isGrounded = controller.isGrounded; // Проверяем, стоит ли игрок на земле
+
+        if (isGrounded && velocity.y < 0)
+        {
+            velocity.y = -2f; // Чтобы стабилизировать игрока на земле
+        }
+
         Move();
+        ApplyGravity();
         HandleInteraction();
     }
 
@@ -30,21 +40,21 @@ public class PlayerBehaviour : MonoBehaviour
         controller.Move(move * moveSpeed * Time.deltaTime);
     }
 
+    void ApplyGravity()
+    {
+        velocity.y += gravity * Time.deltaTime;
+        controller.Move(velocity * Time.deltaTime);
+    }
+
     void HandleInteraction()
     {
         RaycastHit hit;
         if (Physics.Raycast(playerCamera.transform.position, playerCamera.transform.forward, out hit, interactionRange))
         {
             IInteractable interactableObject = hit.collider.GetComponent<IInteractable>();
+            if (interactableObject != null && Input.GetKeyDown(KeyCode.E))
             {
-                if (interactableObject != null)
-                {
-                    if (Input.GetKeyDown(KeyCode.E))
-                    {
-                        interactableObject.Interact();
-                    }
-                }
-
+                interactableObject.Interact();
             }
         }
     }
